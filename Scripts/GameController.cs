@@ -47,6 +47,7 @@ public class GameController : MonoBehaviour
         {
             tictactoeSpaces[i].interactable = true;                     // Setting each button as interactable
             tictactoeSpaces[i].GetComponent<Image>().sprite = null;     // Erasing the image that appears when the button is selected
+            tictactoeSpaces[i].GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);  // Re-adjusting the scale of the buttons
         }
 
         // Looping over the markedSpaces array to reset it's values. the "defult" value is -100
@@ -120,6 +121,18 @@ public class GameController : MonoBehaviour
         int s7 = markedSpaces[0] + markedSpaces[4] + markedSpaces[8];
         int s8 = markedSpaces[2] + markedSpaces[4] + markedSpaces[6];
 
+        // Creating an array that contain smaller arrays with the buttons of the solutions sequences 
+        Button[][] solutionsBtns = new Button[][] {
+            new Button[] {tictactoeSpaces[0], tictactoeSpaces[1], tictactoeSpaces[2]},
+            new Button[] {tictactoeSpaces[3], tictactoeSpaces[4], tictactoeSpaces[5]},
+            new Button[] {tictactoeSpaces[6], tictactoeSpaces[7], tictactoeSpaces[8]},
+            new Button[] {tictactoeSpaces[0], tictactoeSpaces[3], tictactoeSpaces[6]},
+            new Button[] {tictactoeSpaces[1], tictactoeSpaces[4], tictactoeSpaces[7]},
+            new Button[] {tictactoeSpaces[2], tictactoeSpaces[5], tictactoeSpaces[8]},
+            new Button[] {tictactoeSpaces[0], tictactoeSpaces[4], tictactoeSpaces[8]},
+            new Button[] {tictactoeSpaces[2], tictactoeSpaces[4], tictactoeSpaces[6]}
+            };
+
         // Creating an array of the solutions values and looping over it to check if one of the possible solutions had happened
         var solutions = new int[] {s1, s2 ,s3, s4, s5, s6, s7, s8};
         for(int i = 0; i < solutions.Length; i++)
@@ -127,8 +140,8 @@ public class GameController : MonoBehaviour
             // If the value of the solution is equal to either 3 or 6 - we have a winner. 3 would be X and 6 would be O. 
             if(solutions[i] == 3*(whoseTurn+1))
             {
-                WinnerDisplay(i);           // Calling the WinnerDisplay function and providing it with index of the current iteration 
-                WinningSound.Play();        // Playing the winning sound
+                WinnerDisplay(i, solutionsBtns[i]);  // Calling the WinnerDisplay function and providing it with index of the current iteration and array of buttons 
+                WinningSound.Play();                 // Playing the winning sound
                 return true;
             }
         }
@@ -136,7 +149,7 @@ public class GameController : MonoBehaviour
     }
 
     // The WinnerDisplay function is diplaying the winning panel and winning sequence
-    void WinnerDisplay(int indexIn)
+    void WinnerDisplay(int indexIn, Button[] winBtns)
     {
         winnerPanel.gameObject.SetActive(true); // Avtivating the winner panel for the wiining GUI
 
@@ -154,6 +167,13 @@ public class GameController : MonoBehaviour
             winnerText.text = "Player O Wins!";                     // Updating the panel's text
         }
         winningLine[indexIn].SetActive(true);           // Activating the winning sequence line according to the number we received
+
+        // Increasing the scale of the winning sequences buttons
+        for (int i = 0; i < winBtns.Length; i++)
+        {
+            winBtns[i].GetComponent<RectTransform>().localScale = new Vector3(1.3f, 1.3f, 1f);
+        }
+        
     }
 
     // The Rematch function restarts the game but keeping the score as is
@@ -225,6 +245,13 @@ public class GameController : MonoBehaviour
         {
         player2ClickSound.Play();
         }
+    }
+
+    public void IncreaseSize()
+    {
+        RectTransform xPlayerButtonTransform = xPlayerButton.GetComponent<RectTransform>();
+        xPlayerButtonTransform.sizeDelta = new Vector2(400,400);
+        xPlayerButtonTransform.anchoredPosition = new Vector2(300, xPlayerButtonTransform.anchoredPosition.y);
     }
 
 }
